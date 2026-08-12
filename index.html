@@ -8,6 +8,17 @@
   <meta name="theme-color" content="#A61C1C">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <!-- Open Graph для красивой ссылки в мессенджерах -->
+  <meta property="og:title" content="Бургервиль × Кицунэ — доставка еды в Сочи">
+  <meta property="og:description" content="Бургеры, суши, роллы и блюда в самом сердце Сочи. Закажите онлайн!">
+  <meta property="og:image" content="100.jpg">
+  <meta property="og:image:width" content="820">
+  <meta property="og:image:height" content="580">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="100.jpg">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -360,7 +371,6 @@
       }
     }
 
-    // Меню с обновленными фото
     const menuData = [
       { id: 'combo1', category: 'Комбо', title: 'Комбо №1', image: 'combo1.jpg', desc: 'Бургер BBQ с беконом + картофель по-деревенски маленький + морс.', variants: [{ size: 'Стандарт', price: 859 }] },
       { id: 'combo2', category: 'Комбо', title: 'Новинка Пара', image: 'combo2.jpg', desc: 'Мегавиль + Бургервиль + хрустящие креветки в панировке 4 шт + картофель фри большой + морс.', variants: [{ size: 'Стандарт', price: 789 }] },
@@ -458,7 +468,6 @@
     const $productModalOverlay = $('productModalOverlay');
     const $productModalContent = $('productModalContent');
 
-    // Горизонтальный скролл категорий колесиком мыши
     $categoriesScroll.addEventListener('wheel', (e) => {
       if (e.deltaY !== 0) {
         e.preventDefault();
@@ -658,16 +667,6 @@
           openProductModal(product, selectedVariant);
         });
       });
-    }
-
-    function removeFromCart(id) {
-      const existing = findCartItem(id);
-      if (!existing) return;
-      if (existing.qty > 1) existing.qty--;
-      else cart = cart.filter(i => i.id !== id);
-      saveCart();
-      updateCartUI();
-      renderMenu();
     }
 
     function updateCartUI() {
