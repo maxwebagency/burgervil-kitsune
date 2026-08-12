@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover, maximum-scale=1.0">
+  <title>Бургервиль × Кицунэ — доставка еды в Сочи</title>
+  <meta name="description" content="Бургеры, суши, роллы и блюда Бургервиля и Кицунэ в Сочи. Меню, доставка, контакты и оформление заказа онлайн.">
+  <meta name="theme-color" content="#A61C1C">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --accent: #A61C1C;
+      --accent-dark: #8B1515;
+      --bg: #FFFFFF;
+      --bg-secondary: #F5F5F5;
+      --text: #1A1A1A;
+      --text-secondary: #888888;
+      --border: #E8E8E8;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+      --radius: 14px;
+      --radius-lg: 20px;
+      --radius-sm: 10px;
+      --tab-height: 64px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --header-height: 140px;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #F8F8F8;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      width: 100%; min-height: 100vh; background: var(--bg);
+      display: flex; flex-direction: column; position: relative;
+      overflow-x: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.08);
+    }
+
+    .content-wrapper {
+      width: 100%; max-width: 1200px; margin: 0 auto;
+      flex: 1; display: flex; flex-direction: column; padding-top: var(--header-height);
+    }
+
+    /* HEADER */
+    .header {
+      position: fixed; top:0; left:0; width:100%; height: var(--header-height);
+      background: #fff; display:flex; align-items:center; justify-content:space-between;
+      padding: 0 16px; z-index:300; border-bottom:1px solid #f0f0f0;
+      box-shadow:0 1px 4px rgba(0,0,0,0.04);
+    }
+    .header-left { display:flex; align-items:center; flex-shrink:0; }
+    .header-logo-img { height:120px; width:auto; max-width:300px; object-fit:contain; object-position:left center; }
+    .header-center { flex:1; text-align:center; padding:0 12px; min-width:0; }
+    .header-subtitle { font-size:10px; color:#777; margin-top:2px; }
+    .header-right { flex-shrink:0; display:flex; align-items:center; gap:6px; cursor:pointer; padding:8px 12px; border-radius:30px; background:#f8f8f8; transition:background 0.2s; }
+    .header-right:active { background:#f0f0f0; }
+    .header-cart-icon { width:22px; height:22px; stroke:var(--accent); fill:none; }
+    .header-cart-sum { font-weight:700; font-size:14px; color:var(--accent); white-space:nowrap; }
+
+    /* SEARCH */
+    .search-bar { margin:12px 16px; position:relative; flex-shrink:0; }
+    .search-bar input { width:100%; padding:14px 18px 14px 46px; border-radius:50px; border:2px solid var(--border); font-family:'Montserrat',sans-serif; font-size:14px; font-weight:500; background:#fff; transition:all 0.3s; outline:none; color:var(--text); }
+    .search-bar input:focus { border-color:var(--accent); box-shadow:0 0 0 4px rgba(166,28,28,0.08); }
+    .search-bar .search-icon { position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#999; pointer-events:none; }
+
+    /* CATEGORIES */
+    .categories-scroll {
+      display: flex; gap:8px; overflow-x: auto; padding: 0 16px 12px; flex-shrink: 0;
+      -webkit-overflow-scrolling: touch; scrollbar-width: thin; scroll-behavior: smooth;
+      cursor: grab;
+    }
+    .categories-scroll:active { cursor: grabbing; }
+    .categories-scroll::-webkit-scrollbar { display: none; }
+    .cat-chip {
+      flex-shrink:0; padding:10px 18px; border-radius:50px; font-size:13px; font-weight:600;
+      cursor:pointer; transition:all 0.25s; white-space:nowrap; border:2px solid #eee; background:#fff;
+      color:#555; user-select:none; letter-spacing:0.3px;
+    }
+    .cat-chip.active { background:var(--accent); color:#fff; border-color:var(--accent); box-shadow:0 4px 12px rgba(166,28,28,0.25); }
+    .cat-chip:active { transform:scale(0.95); }
+
+    /* MAIN CONTENT */
+    .main-content { flex:1; overflow-y:auto; padding:0 16px 20px; -webkit-overflow-scrolling:touch; padding-bottom:calc(var(--tab-height) + var(--safe-bottom) + 20px); }
+    .menu-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; }
+    @media (min-width:600px) { .menu-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (min-width:900px) { .menu-grid { grid-template-columns: repeat(4, 1fr); } }
+
+    .menu-card {
+      background:#fff; border-radius:var(--radius); overflow:hidden;
+      box-shadow:var(--shadow); transition:transform 0.2s, box-shadow 0.2s;
+      cursor:pointer; display:flex; flex-direction:column;
+    }
+    .menu-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
+    .menu-card .card-img { width:100%; aspect-ratio:1/1; object-fit:cover; background:#f0f0f0; }
+    .card-body { padding:12px; flex:1; display:flex; flex-direction:column; gap:6px; position: relative; }
+    .card-title { font-weight:700; font-size:14px; line-height:1.3; color:var(--text); }
+    .size-tabs { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0; }
+    .size-tab { padding:5px 10px; border-radius:20px; font-size:11px; font-weight:600; color:#888; background:#f5f5f5; border:none; cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+    .size-tab.active { background:#ffe6e6; color:var(--accent); }
+    .product-footer { display:flex; align-items:center; justify-content:space-between; margin-top:auto; }
+    .card-price { font-weight:800; font-size:16px; color:var(--text); }
+
+    /* Кнопка + */
+    .btn-add {
+      width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff;
+      border: none; font-size: 20px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.25s; box-shadow: 0 4px 10px rgba(166,28,28,0.35);
+    }
+    .btn-add:active { transform: scale(0.85); background: var(--accent-dark); }
+
+    /* Счётчик */
+    .counter-wrap {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      border-radius: 20px;
+      padding: 3px 3px 3px 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.12);
+    }
+    .counter-wrap.visible { display: flex; }
+    .counter-wrap .qty { font-weight: 700; font-size: 14px; min-width: 18px; text-align: center; color: var(--text); }
+    .counter-wrap .btn-minus, .counter-wrap .btn-plus {
+      width: 30px; height: 30px; border-radius: 50%; border: none;
+      font-size: 18px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .counter-wrap .btn-minus { background: #f0f0f0; color: #666; }
+    .counter-wrap .btn-plus { background: var(--accent); color: #fff; }
+
+    /* RESTAURANTS VIEW */
+    .restaurants-view { display:none; padding:16px; flex:1; overflow-y:auto; padding-bottom:calc(var(--tab-height) + var(--safe-bottom) + 20px); }
+    .restaurants-view.active { display:block; }
+    .info-card { background:#fff; border-radius:var(--radius-lg); padding:20px; box-shadow:var(--shadow); margin-bottom:12px; }
+    .info-card h3 { font-weight:800; font-size:16px; margin-bottom:10px; }
+    .info-row { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; font-size:13px; color:#555; }
+    .map-container { border-radius:var(--radius-lg); overflow:hidden; box-shadow:var(--shadow); margin-bottom:12px; height:260px; background:#f0f0f0; }
+    .map-container iframe { width:100%; height:100%; border:0; }
+    .about-section { background:#fff; border-radius:var(--radius-lg); padding:20px; box-shadow:var(--shadow); margin-bottom:12px; text-align:center; }
+
+    /* BOTTOM TAB BAR */
+    .tab-bar { position:fixed; bottom:0; left:0; width:100%; height:calc(var(--tab-height) + var(--safe-bottom)); padding-bottom:var(--safe-bottom); background:#fff; display:flex; justify-content:center; border-top:1px solid #f0f0f0; z-index:200; box-shadow:0 -2px 12px rgba(0,0,0,0.04); }
+    .tabs-inner { display:flex; width:100%; max-width:1200px; }
+    .tab-btn { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; cursor:pointer; border:none; background:none; font-family:'Montserrat',sans-serif; font-size:10px; font-weight:600; color:#999; transition:all 0.2s; position:relative; -webkit-tap-highlight-color:transparent; }
+    .tab-btn.active { color:var(--accent); }
+    .tab-btn svg { width:24px; height:24px; fill:currentColor; }
+    .cart-badge { position:absolute; top:4px; right:calc(50% - 22px); background:var(--accent); color:#fff; font-size:10px; font-weight:700; min-width:18px; height:18px; border-radius:50%; display:none; align-items:center; justify-content:center; }
+    .cart-badge.show { display:flex; }
+
+    /* CART SHEET */
+    .overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:350; opacity:0; pointer-events:none; transition:opacity 0.35s; }
+    .overlay.active { opacity:1; pointer-events:auto; }
+    .cart-sheet { position:fixed; bottom:0; left:0; width:100%; max-height:75vh; background:#fff; border-radius:20px 20px 0 0; z-index:351; display:flex; flex-direction:column; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.32,0.72,0,1); box-shadow:0 -10px 30px rgba(0,0,0,0.15); }
+    .cart-sheet.active { transform:translateY(0); }
+    .cart-handle { width:40px; height:4px; background:#ddd; border-radius:2px; margin:12px auto 8px; }
+    .cart-header { padding:0 20px 12px; font-weight:800; font-size:17px; display:flex; align-items:center; gap:8px; }
+    .cart-toggle { display:flex; margin:0 16px 10px; background:#f5f5f5; border-radius:50px; padding:4px; }
+    .cart-toggle button { flex:1; padding:10px; border-radius:50px; border:none; font-weight:600; font-size:12px; cursor:pointer; background:transparent; color:#777; transition:all 0.3s; }
+    .cart-toggle button.active { background:#fff; color:#111; box-shadow:0 2px 8px rgba(0,0,0,0.08); }
+    .cart-items { flex:1; overflow-y:auto; padding:0 16px; min-height:80px; max-height:35vh; }
+    .cart-item { display:flex; align-items:center; gap:10px; padding:12px 0; border-bottom:1px solid #f5f5f5; }
+    .cart-item .ci-img { width:48px; height:48px; border-radius:10px; object-fit:cover; background:#f0f0f0; }
+    .ci-info { flex:1; }
+    .ci-name { font-weight:600; font-size:13px; }
+    .ci-price { font-weight:700; font-size:14px; }
+    .ci-counter { display:flex; align-items:center; gap:8px; }
+    .ci-counter button { width:28px; height:28px; border-radius:50%; border:none; font-weight:700; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .ci-minus { background:#f0f0f0; color:#666; }
+    .ci-plus { background:var(--accent); color:#fff; }
+    .cart-add-more { padding:12px 16px; border-top:1px solid #f0f0f0; background:#fafafa; }
+    .add-more-title { font-weight:700; font-size:13px; margin-bottom:8px; color:#555; }
+    .add-more-chips { display:flex; gap:8px; overflow-x:auto; scrollbar-width:none; padding-bottom:4px; }
+    .add-more-chip { flex-shrink:0; padding:8px 16px; border-radius:50px; background:#fff; font-size:12px; font-weight:600; cursor:pointer; border:1px solid #eee; white-space:nowrap; }
+    .cart-footer { padding:12px 16px; border-top:1px solid #f0f0f0; display:flex; align-items:center; gap:12px; }
+    .cart-footer .total { font-weight:800; font-size:16px; }
+    .btn-checkout { padding:14px 28px; background:var(--accent); color:#fff; border:none; border-radius:50px; font-weight:700; font-size:14px; cursor:pointer; }
+    .cart-empty { text-align:center; padding:30px; color:#bbb; }
+
+    /* ORDER MODAL */
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:400; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.35s; }
+    .modal-overlay.active { opacity:1; pointer-events:auto; }
+    .modal-sheet { background:#fff; width:100%; max-width:480px; max-height:85vh; border-radius:20px 20px 0 0; padding:24px 16px; overflow-y:auto; transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.32,0.72,0,1); padding-bottom:calc(24px + var(--safe-bottom)); }
+    .modal-overlay.active .modal-sheet { transform:translateY(0); }
+    .modal-close { position:absolute; top:16px; right:16px; background:#f0f0f0; border:none; width:36px; height:36px; border-radius:50%; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#666; }
+    .modal-sheet h3 { font-weight:800; font-size:20px; text-align:center; margin-bottom:20px; }
+    .form-group { margin-bottom:16px; }
+    .form-group label { display:block; font-weight:600; font-size:12px; margin-bottom:6px; color:#555; text-transform:uppercase; letter-spacing:0.5px; }
+    .form-group input, .form-group textarea { width:100%; padding:12px 16px; border-radius:var(--radius-sm); border:2px solid var(--border); font-family:'Montserrat',sans-serif; font-size:14px; outline:none; background:#fff; color:var(--text); }
+    .form-group input:focus, .form-group textarea:focus { border-color:var(--accent); box-shadow:0 0 0 4px rgba(166,28,28,0.06); }
+    .payment-options { display:flex; gap:8px; flex-wrap:wrap; }
+    .payment-option { flex:1; min-width:100px; padding:12px; border-radius:var(--radius-sm); border:2px solid var(--border); text-align:center; cursor:pointer; font-weight:600; font-size:13px; transition:all 0.3s; background:#fff; }
+    .payment-option.active { border-color:var(--accent); background:#fef5f5; color:var(--accent); }
+    .payment-note { font-size:11px; color:#888; margin-top:6px; text-align:center; display:none; }
+    .payment-note.show { display:block; }
+    .btn-submit { width:100%; padding:16px; background:var(--accent); color:#fff; border:none; border-radius:50px; font-weight:700; font-size:16px; cursor:pointer; margin-top:8px; letter-spacing:0.5px; transition:background 0.3s, transform 0.2s; box-shadow:0 4px 14px rgba(166,28,28,0.35); }
+    .btn-submit:active { background:var(--accent-dark); transform:scale(0.97); }
+    .success-msg { display:none; text-align:center; padding:30px; color:#2e7d32; font-weight:700; font-size:16px; }
+    .success-msg.show { display:block; }
+
+    /* PRODUCT MODAL */
+    .product-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:500; display:flex; align-items:center; justify-content:center; opacity:0; pointer-events:none; transition:opacity 0.35s; }
+    .product-modal-overlay.active { opacity:1; pointer-events:auto; }
+    .product-modal-content { background:#fff; border-radius:24px; width:90%; max-width:500px; max-height:90vh; overflow-y:auto; padding:24px; position:relative; }
+    .product-modal-img { width:100%; border-radius:16px; margin-bottom:16px; }
+    .product-modal-title { font-weight:800; font-size:22px; margin-bottom:8px; }
+    .product-modal-desc { color:#555; font-size:14px; line-height:1.5; margin-bottom:16px; }
+    .product-modal-tabs { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+    .product-modal-tabs .size-tab { font-size:13px; padding:8px 14px; }
+    .product-modal-footer { display:flex; align-items:center; justify-content:space-between; }
+    .product-modal-price { font-weight:800; font-size:22px; }
+    .product-modal-add { width:48px; height:48px; border-radius:50%; background:var(--accent); color:#fff; border:none; font-size:24px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 14px rgba(166,28,28,0.35); }
+
+    @media (max-width: 380px) {
+      .header-logo-img { height:80px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container" id="app">
+  <div class="content-wrapper">
+    <!-- HEADER -->
+    <header class="header" id="mainHeader">
+      <div class="header-left">
+        <img src="100.jpg" alt="Бургервиль × Кицунэ" class="header-logo-img">
+      </div>
+      <div class="header-center">
+        <div class="header-subtitle">Сочи · Бургеры и суши</div>
+      </div>
+      <div class="header-right" id="headerCartBtn">
+        <svg class="header-cart-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <span class="header-cart-sum" id="headerCartSum">0 ₽</span>
+      </div>
+    </header>
+
+    <!-- SEARCH -->
+    <div class="search-bar">
+      <span class="search-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      <input type="text" id="searchInput" placeholder="Поиск по меню...">
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="categories-scroll" id="categoriesScroll">
+      <span class="cat-chip active" data-cat="all">Все</span>
+      <span class="cat-chip" data-cat="Комбо">Комбо</span>
+      <span class="cat-chip" data-cat="Бургеры">Бургеры</span>
+      <span class="cat-chip" data-cat="Закуски">Закуски</span>
+      <span class="cat-chip" data-cat="Салаты">Салаты</span>
+      <span class="cat-chip" data-cat="Поке">Поке</span>
+      <span class="cat-chip" data-cat="Пасты">Пасты</span>
+      <span class="cat-chip" data-cat="Горячее">Горячее</span>
+      <span class="cat-chip" data-cat="Холодные роллы">Холодные роллы</span>
+      <span class="cat-chip" data-cat="Жареные роллы">Жареные роллы</span>
+      <span class="cat-chip" data-cat="Запеченные роллы">Запеченные роллы</span>
+      <span class="cat-chip" data-cat="Лимонады">Лимонады</span>
+      <span class="cat-chip" data-cat="Чаи">Чаи</span>
+      <span class="cat-chip" data-cat="Соусы">Соусы</span>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="mainContent">
+      <div class="menu-grid" id="menuGrid"></div>
+    </div>
+
+    <!-- RESTAURANTS VIEW -->
+    <div class="restaurants-view" id="restaurantsView">
+      <div class="info-card">
+        <h3>📍 Бургервиль × Кицунэ</h3>
+        <div class="info-row"><span>🏠</span><span>Краснодарский край, Сочи, мкр. Мамайка, Крымская ул., 89</span></div>
+        <div class="info-row"><span>📞</span><span><a href="tel:+79388886402">8-938-888-64-02</a></span></div>
+        <div class="info-row"><span>🕐</span><span>с 10:00 до 22:00</span></div>
+        <div class="info-row"><span>✉️</span><span>burger.vil@yandex.ru</span></div>
+      </div>
+      <div class="map-container" id="mapContainer"></div>
+      <div class="about-section"><h3>О нас</h3><p>Бургервиль и Кицунэ — два направления одного ресторана в сердце Сочи.</p></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM TAB BAR -->
+  <nav class="tab-bar" id="tabBar">
+    <div class="tabs-inner">
+      <button class="tab-btn active" data-tab="menu" id="tabMenu"><svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg><span>Меню</span></button>
+      <button class="tab-btn" data-tab="restaurants" id="tabRestaurants"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span>Рестораны</span></button>
+      <button class="tab-btn" data-tab="cart" id="tabCart">
+        <!-- АДЕКВАТНАЯ ИКОНКА КОРЗИНЫ (ТЕЛЕЖКА) -->
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+          <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+        </svg>
+        <span>Корзина</span>
+        <span class="cart-badge" id="cartBadge">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- CART OVERLAY & SHEET -->
+  <div class="overlay" id="cartOverlay"></div>
+  <div class="cart-sheet" id="cartSheet">
+    <div class="cart-handle"></div>
+    <div class="cart-header"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:22px;height:22px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> Корзина</div>
+    <div class="cart-toggle" id="cartToggle"><button class="active" data-mode="pickup">📍 Самовывоз</button><button data-mode="delivery">🏍️ Доставка</button></div>
+    <div class="cart-auto-comment" id="cartAutoComment" style="display:none;"></div>
+    <div class="cart-items" id="cartItems"><div class="cart-empty">Корзина пуста</div></div>
+    <div class="cart-add-more" id="cartAddMore"><div class="add-more-title">➕ Добавить соусы</div><div class="add-more-chips" id="addMoreChips"></div></div>
+    <div class="cart-footer"><span class="total" id="cartTotal">Итого: 0 ₽</span><button class="btn-checkout" id="btnCheckout" disabled>К оформлению</button></div>
+  </div>
+
+  <!-- ORDER MODAL -->
+  <div class="modal-overlay" id="orderModalOverlay">
+    <div class="modal-sheet">
+      <button class="modal-close" id="modalClose">✕</button>
+      <h3>📋 Оформление заказа</h3>
+      <form id="orderForm" novalidate>
+        <div class="form-group"><label>Имя *</label><input type="text" name="name" id="formName" placeholder="Ваше имя" required></div>
+        <div class="form-group"><label>Телефон *</label><input type="tel" name="phone" id="formPhone" placeholder="+7 (999) 123-45-67" required></div>
+        <div class="form-group"><label>Город</label><input type="text" name="city" id="formCity" value="Сочи" readonly></div>
+        <div class="form-group"><label>Улица</label><input type="text" name="street" id="formStreet" placeholder="ул. Крымская"></div>
+        <div class="form-group" style="display:flex;gap:8px;"><div style="flex:1"><label>Дом</label><input type="text" name="house" id="formHouse" placeholder="89"></div><div style="flex:1"><label>Квартира</label><input type="text" name="apartment" id="formApartment" placeholder="12"></div></div>
+        <div class="form-group"><label>Комментарий</label><textarea name="comment" id="formComment" placeholder="Пожелания к заказу..."></textarea></div>
+        <div class="form-group"><label>Способ оплаты</label><div class="payment-options"><div class="payment-option active" data-payment="cash">💵 Наличные</div><div class="payment-option" data-payment="online">💳 Онлайн</div></div><p class="payment-note" id="paymentNote">После оформления с вами свяжется оператор для оплаты</p></div>
+        <input type="hidden" name="payment_method" id="paymentMethod" value="cash">
+        <input type="hidden" name="cart_data" id="cartData" value="">
+        <input type="hidden" name="order_total" id="orderTotal" value="">
+        <input type="hidden" name="delivery_mode" id="deliveryMode" value="pickup">
+        <button type="submit" class="btn-submit" id="btnSubmit">📩 Отправить заказ</button>
+      </form>
+      <div class="success-msg" id="successMsg">✅ <strong>Заказ отправлен!</strong><br>Скоро с вами свяжется оператор.</div>
+    </div>
+  </div>
+
+  <!-- PRODUCT DETAIL MODAL -->
+  <div class="product-modal-overlay" id="productModalOverlay">
+    <div class="product-modal-content" id="productModalContent"></div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const RESTAURANT_LAT = 43.627763;
+    const RESTAURANT_LNG = 39.696130;
+
+    function updateMapAndRoute() {
+      const mc = document.getElementById('mapContainer');
+      if (mc) {
+        mc.innerHTML = `<iframe src="https://yandex.ru/map-widget/v1/?ll=${RESTAURANT_LNG}%2C${RESTAURANT_LAT}&z=17&pt=${RESTAURANT_LNG},${RESTAURANT_LAT},pm2rdl&l=map&size=650,450" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
+      }
+    }
+
+    // Меню с обновленными фото
+    const menuData = [
+      { id: 'combo1', category: 'Комбо', title: 'Комбо №1', image: 'combo1.jpg', desc: 'Бургер BBQ с беконом + картофель по-деревенски маленький + морс.', variants: [{ size: 'Стандарт', price: 859 }] },
+      { id: 'combo2', category: 'Комбо', title: 'Новинка Пара', image: 'combo2.jpg', desc: 'Мегавиль + Бургервиль + хрустящие креветки в панировке 4 шт + картофель фри большой + морс.', variants: [{ size: 'Стандарт', price: 789 }] },
+      { id: 'combo3', category: 'Комбо', title: 'Детский', image: 'combo3.jpg', desc: 'Индивиль + картофель фри маленький + морс + мини-игрушка.', variants: [{ size: 'Стандарт', price: 799 }] },
+      { id: 'combo4', category: 'Комбо', title: 'Комбо №4', image: 'combo4.jpg', desc: 'Острый бургер с вялеными томатами + картофель фри маленький + сладкий чили соус.', variants: [{ size: 'Стандарт', price: 829 }] },
+      { id: 'combo5', category: 'Комбо', title: 'Ведерко с закусками', image: '5.jpg', desc: 'Острые крылья BBQ (4 шт) + наггетсы (6 шт) + хрустящие креветки в панировке (4 шт) + картофель фри маленький + соус BBQ (30 г) + сырный соус (30 г).', variants: [{ size: 'Стандарт', price: 1199 }] },
+      { id: 'b_mega', category: 'Бургеры', title: 'Мегавиль', image: '7.jpg', desc: 'Мягкая булочка бриошь, две сочные котлеты из мраморной говядины под плавленым сыром Чеддер, соус тейсти в сочетании с соусом BBQ, лук, салат айсберг, розовые томаты и маринованные огурчики.', variants: [{ size: 'Стандарт', price: 799 }] },
+      { id: 'b_bbq', category: 'Бургеры', title: 'BBQ с беконом', image: '1.jpg', desc: 'Мягкая булочка бриошь, сочная котлета из говядины под плавленым сыром Чеддер, классическое сочетание соуса BBQ и хрустящего бекона, дегидрированный жареный лук, салат айсберг, розовые томаты и маринованные огурчики.', variants: [{ size: 'Стандарт', price: 769 }] },
+      { id: 'b_burgerville', category: 'Бургеры', title: 'Бургервиль', image: '3.jpg', desc: 'Мягкая булочка бриошь, сочная котлета из мраморной говядины под плавленым сыром Чеддер, соус «Тейсти», карамелизированный лук, салат айсберг, розовые маринованные огурчики.', variants: [{ size: 'Стандарт', price: 699 }] },
+      { id: 'b_spicy', category: 'Бургеры', title: 'Острый бургер с вялеными томатами', image: '8.jpg', desc: 'Мягкая булочка бриошь, сочная котлета из мраморной говядины под плавленым сыром Чеддер, острый соус с вялеными томатами и перцем халапеньо, карамелизированный лук, салат айсберг, розовые томаты и маринованные огурчики.', variants: [{ size: 'Стандарт', price: 719 }] },
+      { id: 'b_indi', category: 'Бургеры', title: 'Индивиль', image: '6.jpg', desc: 'Мягкая булочка бриошь, нежная котлета из индейки под плавленым сыром Чеддер, белый чесночный соус, салат коул слоу, розовые томаты и свежие огурчики.', variants: [{ size: 'Стандарт', price: 619 }] },
+      { id: 'b_cheese', category: 'Бургеры', title: 'Чизбурвиль', image: '9.jpg', desc: 'Мягкая булочка бриошь, сочная котлета из мраморной говядины под плавленым сыром Чеддер, томатный соус, салат айсберг, розовые томаты и маринованные огурчики.', variants: [{ size: 'Стандарт', price: 599 }] },
+      { id: 'fries', category: 'Закуски', title: 'Картофель фри', image: '15.jpg', desc: 'Хрустящий картофель фри.', variants: [{ size: '100 г', price: 189 }, { size: '200 г', price: 289 }] },
+      { id: 'nuggets', category: 'Закуски', title: 'Наггетсы', image: 'nuggets.jpg', desc: 'Сочные куриные наггетсы.', variants: [{ size: '6 шт', price: 259 }, { size: '12 шт', price: 449 }] },
+      { id: 'potato_village', category: 'Закуски', title: 'Картофель по-деревенски', image: '14.jpg', desc: 'Ароматный картофель по-деревенски.', variants: [{ size: '100 г', price: 189 }, { size: '200 г', price: 289 }] },
+      { id: 'shrimp', category: 'Закуски', title: 'Хрустящие тигровые креветки в панировке', image: '11.jpg', desc: 'Отборные креветки в хрустящей панировке.', variants: [{ size: '4 шт', price: 399 }, { size: '6 шт', price: 499 }] },
+      { id: 'wings', category: 'Закуски', title: 'Острые крылья BBQ', image: 'wings.jpg', desc: 'Пикантные куриные крылья в соусе BBQ.', variants: [{ size: '6 шт', price: 499 }, { size: '12 шт', price: 899 }] },
+      { id: 'cheese_sticks', category: 'Закуски', title: 'Сырные палочки', image: '18.jpg', desc: 'Сырные палочки в панировке, подаются с соусом.', variants: [{ size: '5 шт', price: 279 }] },
+      { id: 'sauces', category: 'Соусы', title: 'Соус', image: 'sauce.jpg', desc: 'Выберите соус: сырный, чесночный, барбекю, кетчуп.', variants: [
+        { size: 'Сырный', price: 30 }, { size: 'Чесночный', price: 30 }, { size: 'Барбекю', price: 30 }, { size: 'Кетчуп', price: 30 }
+      ]},
+      { id: 'steak_salad', category: 'Салаты', title: 'Стейк-салат', image: '27.jpg', desc: 'Микс салата, специальный соус на основе кунжутного масла и соуса «Пиканья», томаты черри.', variants: [{ size: 'Стандарт', price: 639 }] },
+      { id: 'eggplant_salad', category: 'Салаты', title: 'Хрустящие баклажаны', image: '10.jpg', desc: 'Баклажаны, томаты, зелень, мята, творожный сыр, сладкий чили соус.', variants: [{ size: 'Стандарт', price: 519 }] },
+      { id: 'greek_salad', category: 'Салаты', title: 'Греческий', image: '12.jpg', desc: 'Томаты, лук красный, сыр Фета, перец болгарский, огурцы, маслины, масло оливковое, черный перец.', variants: [{ size: 'Стандарт', price: 449 }] },
+      { id: 'caesar_shrimp', category: 'Салаты', title: 'Цезарь с креветками', image: '28.jpg', desc: 'Салат Айсберг в сочетании с классическим соусом «Цезарь», обжаренные тигровые креветки, томаты черри, сыр Пармезан и сухарики.', variants: [{ size: 'Стандарт', price: 649 }] },
+      { id: 'poke_eel', category: 'Поке', title: 'Поке с угрем', image: '81.jpg', desc: 'Рис, кукуруза, бобы эдамаме, угорь, омлет тамаго, авокадо, огурец, нори, унаги, кунжут, соус понзу.', variants: [{ size: 'Стандарт', price: 798 }] },
+      { id: 'poke_salmon', category: 'Поке', title: 'Поке с лососем', image: '79.jpg', desc: 'Рис, лосось, манго, авокадо, масаго, бобы эдамаме, нори, соус понзу.', variants: [{ size: 'Стандарт', price: 798 }] },
+      { id: 'poke_tuna', category: 'Поке', title: 'Поке с тунцом', image: '80.jpg', desc: 'Рис, тунец, апельсин, огурцы, авокадо, масаго, нори, соус понзу.', variants: [{ size: 'Стандарт', price: 798 }] },
+      { id: 'carbonara', category: 'Пасты', title: 'Карбонара', image: '25.jpg', desc: 'Спагетти в нежном сливочном соусе, жареный бекон, томаты черри, сыр пармезан, желток и руккола.', variants: [{ size: 'Стандарт', price: 579 }] },
+      { id: 'pasta_chicken', category: 'Пасты', title: 'Паста с курицей и грибами', image: '26.jpg', desc: 'Спагетти в сливочном соусе, куриное филе, грибы шампиньоны, томаты черри, пармезан и руккола.', variants: [{ size: 'Стандарт', price: 599 }] },
+      { id: 'sea_pasta', category: 'Пасты', title: 'Морская паста', image: '13.jpg', desc: 'Мидии, лосось, креветки, чеснок, спагетти, сыр пармезан, сыр моцарелла, сливочный соус.', variants: [{ size: 'Стандарт', price: 629 }] },
+      { id: 'pho_bo', category: 'Горячее', title: 'Фо-Бо', image: '85.jpg', desc: 'Наваристый говяжий бульон, слайсы говядины, лапша удон, зелень, лайм, острый перец по вкусу в традициях вьетнамской кухни.', variants: [{ size: 'Стандарт', price: 548 }] },
+      { id: 'tom_yum', category: 'Горячее', title: 'Том Ям', image: '84.jpg', desc: 'Куриный бульон, тигровая креветка, мидии, кальмар, лосось, кокосовое молоко, кинза, помидоры черри, рис.', variants: [{ size: 'Стандарт', price: 678 }] },
+      { id: 'mussels_tomyum', category: 'Горячее', title: 'Мидии в соусе Том-Ям', image: '55.jpg', desc: 'Мидии в густом соусе том-ям, в меру острый с цитрусовыми нотками лемонграсса — легенда тайской кухни. Хрустящие крутоны.', variants: [{ size: 'Стандарт', price: 959 }] },
+      { id: 'mussels_creamy', category: 'Горячее', title: 'Мидии в сливочном соусе с сыром', image: '54.jpg', desc: 'Мидии в сливочно-сырном соусе, подаются с хрустящими крутонами.', variants: [{ size: 'Стандарт', price: 959 }] },
+      { id: 'ikadzuti', category: 'Холодные роллы', title: 'Икадзути (8 шт)', image: '38.jpg', desc: 'Рис, нори, творожный сыр, лосось, икра масаго, авокадо, тунец, чили соус, микрозелень.', variants: [{ size: '8 шт', price: 799 }] },
+      { id: 'canada', category: 'Холодные роллы', title: 'Канада (8 шт)', image: '39.jpg', desc: 'Рис, нори, творожный сыр, лосось, авокадо, угорь, огурец, масаго.', variants: [{ size: '8 шт', price: 899 }] },
+      { id: 'rakuen', category: 'Холодные роллы', title: 'Ракуэн (8 шт)', image: '82.jpg', desc: 'Рис, нори, спринг-тесто, творожный сыр, огурец, креветка темпура, икра масаго, лосось, чили соус, авокадо, микрозелень.', variants: [{ size: '8 шт', price: 799 }] },
+      { id: 'kitsune', category: 'Холодные роллы', title: 'Кицунэ (8 шт)', image: '68.jpg', desc: 'Рис, нори, творожный сыр, авокадо, тунец, масаго, лосось, икра лосося красная, микрозелень.', variants: [{ size: '8 шт', price: 959 }] },
+      { id: 'nido', category: 'Жареные роллы', title: 'Нидо (8 шт)', image: '62.jpg', desc: 'Рис, нори, сливочный сыр, авокадо, угорь, гребешок, соус унаги, кляр.', variants: [{ size: '8 шт', price: 809 }] },
+      { id: 'yukai', category: 'Жареные роллы', title: 'Юкай (8 шт)', image: '94.jpg', desc: 'Рис, нори, сливочный сыр, масаго, тигровая креветка, лосось терияки, авокадо, соус унаги, кляр.', variants: [{ size: '8 шт', price: 799 }] },
+      { id: 'sanka', category: 'Запеченные роллы', title: 'Санка (8 шт)', image: '83.jpg', desc: 'Рис, нори, творожный сыр, огурец, лосось, угорь, тигровая креветка, яки соус, соус унаги.', variants: [{ size: '8 шт', price: 819 }] },
+      { id: 'yuake', category: 'Запеченные роллы', title: 'Юакэ (8 шт)', image: '93.jpg', desc: 'Рис, нори, лосось, гребешок, огурец, яки соус, чили соус.', variants: [{ size: '8 шт', price: 809 }] },
+      { id: 'lemonades', category: 'Лимонады', title: 'Лимонад', image: '2.jpg', desc: 'Освежающие лимонады (500 мл).', variants: [
+        { size: 'Клубника-лайм', price: 349 }, { size: 'Ананас-базилик', price: 349 }, { size: 'Гранат-смородина', price: 349 },
+        { size: 'Киви-фейхоа', price: 349 }, { size: 'Манго-лимон', price: 349 }
+      ]},
+      { id: 'tea', category: 'Чаи', title: 'Чай', image: '4.jpg', desc: 'Ароматный чай.', variants: [
+        { size: '350 мл Манго-маракуя', price: 249 }, { size: '350 мл Черника-мята', price: 249 }, { size: '350 мл Тропический киви', price: 249 },
+        { size: '350 мл Земляничный', price: 249 }, { size: '350 мл Пряная облепиха', price: 249 },
+        { size: '750 мл Жасминовый улун', price: 549 }, { size: '750 мл Фруктовый', price: 549 }, { size: '750 мл Травяной малина-мята', price: 549 }
+      ]}
+    ];
+
+    let cart = [];
+    let activeCategory = 'all';
+    let searchQuery = '';
+    let currentTab = 'menu';
+    let deliveryMode = 'pickup';
+
+    const PLACEHOLDER_SVG = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="300" height="300"%3E%3Crect fill="%23f5f5f5" width="300" height="300" rx="14"/%3E%3Ctext x="150" y="145" text-anchor="middle" fill="%23d0d0d0" font-size="60"%3E🍽️%3C/text%3E%3C/svg%3E';
+    window.handleImgError = function(img) { if (img.src !== PLACEHOLDER_SVG) { img.src = PLACEHOLDER_SVG; img.onerror = null; } };
+
+    function saveCart() { localStorage.setItem('burgerville_cart', JSON.stringify(cart)); }
+    function getCartTotal() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
+    function getCartCount() { return cart.reduce((s, i) => s + i.qty, 0); }
+    function findCartItem(id) { return cart.find(i => i.id === id); }
+
+    try { const saved = localStorage.getItem('burgerville_cart'); if (saved) cart = JSON.parse(saved); } catch(e){}
+
+    const $ = id => document.getElementById(id);
+    const $menuGrid = $('menuGrid');
+    const $searchInput = $('searchInput');
+    const $categoriesScroll = $('categoriesScroll');
+    const $cartSheet = $('cartSheet');
+    const $cartOverlay = $('cartOverlay');
+    const $cartItems = $('cartItems');
+    const $cartTotal = $('cartTotal');
+    const $cartBadge = $('cartBadge');
+    const $btnCheckout = $('btnCheckout');
+    const $cartAutoComment = $('cartAutoComment');
+    const $addMoreChips = $('addMoreChips');
+    const $cartAddMore = $('cartAddMore');
+    const $orderModalOverlay = $('orderModalOverlay');
+    const $orderForm = $('orderForm');
+    const $successMsg = $('successMsg');
+    const $paymentNote = $('paymentNote');
+    const $paymentMethod = $('paymentMethod');
+    const $deliveryMode = $('deliveryMode');
+    const $cartData = $('cartData');
+    const $orderTotal = $('orderTotal');
+    const $restaurantsView = $('restaurantsView');
+    const $mainContent = $('mainContent');
+    const $headerCartSum = $('headerCartSum');
+    const $productModalOverlay = $('productModalOverlay');
+    const $productModalContent = $('productModalContent');
+
+    // Горизонтальный скролл категорий колесиком мыши
+    $categoriesScroll.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        $categoriesScroll.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+
+    function getFilteredMenu() {
+      let items = menuData;
+      if (activeCategory !== 'all') items = items.filter(i => i.category === activeCategory);
+      if (searchQuery.trim()) {
+        const q = searchQuery.trim().toLowerCase();
+        items = items.filter(i => i.title.toLowerCase().includes(q));
+      }
+      return items;
+    }
+
+    function openProductModal(product, selectedVariant) {
+      const modal = $productModalContent;
+      modal.innerHTML = `
+        <button class="modal-close" style="position:absolute;top:12px;right:12px;" onclick="document.getElementById('productModalOverlay').classList.remove('active')">✕</button>
+        <img src="${product.image}" alt="${product.title}" class="product-modal-img" onerror="handleImgError(this)">
+        <div class="product-modal-title">${product.title}</div>
+        <div class="product-modal-desc">${product.desc || ''}</div>
+        <div class="product-modal-tabs" id="modalTabs"></div>
+        <div class="product-modal-footer">
+          <span class="product-modal-price" id="modalPrice">0 ₽</span>
+          <button class="product-modal-add" id="modalAddBtn">+</button>
+        </div>
+      `;
+      const tabsContainer = document.getElementById('modalTabs');
+      const priceSpan = document.getElementById('modalPrice');
+      const addBtn = document.getElementById('modalAddBtn');
+
+      let currentVariant = selectedVariant;
+      function updateModalUI() {
+        if (product.variants.length > 1) {
+          tabsContainer.innerHTML = product.variants.map(v => `
+            <button class="size-tab ${v === currentVariant ? 'active' : ''}">${v.size} · ${v.price} ₽</button>
+          `).join('');
+          tabsContainer.querySelectorAll('.size-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+              currentVariant = product.variants.find(v => v.size === btn.innerText.split(' · ')[0]);
+              updateModalUI();
+            });
+          });
+        } else {
+          tabsContainer.innerHTML = '';
+        }
+        priceSpan.textContent = `${currentVariant.price} ₽`;
+      }
+      updateModalUI();
+
+      addBtn.addEventListener('click', () => {
+        const cartItemId = `${product.id}_${currentVariant.size}`;
+        const existing = findCartItem(cartItemId);
+        if (existing) existing.qty++;
+        else cart.push({ id: cartItemId, name: `${product.title} (${currentVariant.size})`, price: currentVariant.price, image: product.image, category: product.category, qty: 1 });
+        saveCart();
+        updateCartUI();
+        renderMenu();
+        $productModalOverlay.classList.remove('active');
+      });
+
+      $productModalOverlay.classList.add('active');
+    }
+
+    function renderProductCard(product) {
+      const card = document.createElement('div');
+      card.className = 'menu-card';
+      card.innerHTML = `
+        <img src="${product.image}" alt="${product.title}" class="card-img" onerror="handleImgError(this)" loading="lazy">
+        <div class="card-body">
+          <div class="card-title">${product.title}</div>
+          <div class="size-tabs" id="tabs-${product.id}"></div>
+          <div class="product-footer">
+            <span class="card-price" id="price-${product.id}">0 ₽</span>
+            <div class="btn-add" id="add-${product.id}">+</div>
+            <div class="counter-wrap" id="counter-${product.id}">
+              <button class="btn-minus">−</button>
+              <span class="qty">0</span>
+              <button class="btn-plus">+</button>
+            </div>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    function renderMenu() {
+      const items = getFilteredMenu();
+      $menuGrid.innerHTML = items.length ? '' : '<div class="no-results">😔 Ничего не найдено</div>';
+      items.forEach(product => {
+        const card = renderProductCard(product);
+        $menuGrid.appendChild(card);
+
+        const tabsContainer = document.getElementById(`tabs-${product.id}`);
+        const priceSpan = document.getElementById(`price-${product.id}`);
+        const addBtn = document.getElementById(`add-${product.id}`);
+        const counterWrap = document.getElementById(`counter-${product.id}`);
+        const qtySpan = counterWrap.querySelector('.qty');
+        const minusBtn = counterWrap.querySelector('.btn-minus');
+        const plusBtn = counterWrap.querySelector('.btn-plus');
+
+        let selectedVariant = product.variants[0];
+
+        function getCartItemId() {
+          return `${product.id}_${selectedVariant.size}`;
+        }
+
+        function updateCardUI() {
+          if (product.variants.length > 1) {
+            tabsContainer.innerHTML = product.variants.map(v => `
+              <button class="size-tab ${v === selectedVariant ? 'active' : ''}">${v.size} · ${v.price} ₽</button>
+            `).join('');
+            tabsContainer.querySelectorAll('.size-tab').forEach(btn => {
+              btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                selectedVariant = product.variants.find(v => v.size === btn.innerText.split(' · ')[0]);
+                updateCardUI();
+              });
+            });
+          } else {
+            tabsContainer.innerHTML = '';
+          }
+          priceSpan.textContent = `${selectedVariant.price} ₽`;
+
+          const cartItem = findCartItem(getCartItemId());
+          const qty = cartItem ? cartItem.qty : 0;
+          if (qty > 0) {
+            addBtn.style.display = 'none';
+            counterWrap.classList.add('visible');
+            qtySpan.textContent = qty;
+          } else {
+            addBtn.style.display = 'flex';
+            counterWrap.classList.remove('visible');
+          }
+        }
+
+        updateCardUI();
+
+        addBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const cartItemId = getCartItemId();
+          const existing = findCartItem(cartItemId);
+          if (existing) {
+            existing.qty++;
+          } else {
+            cart.push({
+              id: cartItemId,
+              name: `${product.title} (${selectedVariant.size})`,
+              price: selectedVariant.price,
+              image: product.image,
+              category: product.category,
+              qty: 1
+            });
+          }
+          saveCart();
+          updateCartUI();
+          updateCardUI();
+        });
+
+        plusBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const cartItemId = getCartItemId();
+          const existing = findCartItem(cartItemId);
+          if (existing) {
+            existing.qty++;
+            saveCart();
+            updateCartUI();
+            updateCardUI();
+          }
+        });
+
+        minusBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const cartItemId = getCartItemId();
+          const existing = findCartItem(cartItemId);
+          if (existing) {
+            if (existing.qty > 1) {
+              existing.qty--;
+              saveCart();
+            } else {
+              cart = cart.filter(i => i.id !== cartItemId);
+              saveCart();
+            }
+            updateCartUI();
+            updateCardUI();
+            if (!cart.length) {
+              // корзина опустела
+            }
+          }
+        });
+
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.size-tab') || e.target.closest('.btn-add') || e.target.closest('.counter-wrap')) return;
+          openProductModal(product, selectedVariant);
+        });
+      });
+    }
+
+    function removeFromCart(id) {
+      const existing = findCartItem(id);
+      if (!existing) return;
+      if (existing.qty > 1) existing.qty--;
+      else cart = cart.filter(i => i.id !== id);
+      saveCart();
+      updateCartUI();
+      renderMenu();
+    }
+
+    function updateCartUI() {
+      const count = getCartCount();
+      const total = getCartTotal();
+      $cartBadge.textContent = count;
+      $cartBadge.classList.toggle('show', count > 0);
+      $btnCheckout.disabled = count === 0;
+      $cartTotal.textContent = `Итого: ${total} ₽`;
+      $headerCartSum.textContent = `${total} ₽`;
+      renderCartItems();
+      $cartAutoComment.textContent = '';
+      $cartAutoComment.style.display = 'none';
+    }
+
+    function renderCartItems() {
+      $cartItems.innerHTML = '';
+      if (!cart.length) {
+        $cartItems.innerHTML = '<div class="cart-empty">Корзина пуста</div>';
+        $cartAddMore.style.display = 'none';
+        return;
+      }
+      $cartAddMore.style.display = 'block';
+      cart.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `<img src="${item.image}" class="ci-img" onerror="this.src='${PLACEHOLDER_SVG}'"><div class="ci-info"><div class="ci-name">${item.name}</div></div><div class="ci-price">${item.price*item.qty} ₽</div><div class="ci-counter"><button class="ci-minus" data-id="${item.id}">−</button><span>${item.qty}</span><button class="ci-plus" data-id="${item.id}">+</button></div>`;
+        $cartItems.appendChild(div);
+      });
+      $cartItems.querySelectorAll('.ci-plus').forEach(b => b.addEventListener('click', () => {
+        const item = findCartItem(b.dataset.id);
+        if (item) { item.qty++; saveCart(); updateCartUI(); renderMenu(); }
+      }));
+      $cartItems.querySelectorAll('.ci-minus').forEach(b => b.addEventListener('click', () => {
+        const item = findCartItem(b.dataset.id);
+        if (item) {
+          if (item.qty > 1) { item.qty--; saveCart(); }
+          else { cart = cart.filter(i => i.id !== b.dataset.id); saveCart(); }
+          updateCartUI(); renderMenu();
+          if (!cart.length) closeCart();
+        }
+      }));
+    }
+
+    function renderAddMoreChips() {
+      const sauces = menuData.find(i => i.id === 'sauces');
+      if (!sauces) return;
+      $addMoreChips.innerHTML = '';
+      sauces.variants.forEach(v => {
+        const chip = document.createElement('span');
+        chip.className = 'add-more-chip';
+        chip.innerHTML = `Соус ${v.size} <strong>${v.price}₽</strong>`;
+        chip.addEventListener('click', () => {
+          const cartItemId = `sauces_${v.size}`;
+          const existing = findCartItem(cartItemId);
+          if (existing) existing.qty++;
+          else cart.push({ id: cartItemId, name: `Соус ${v.size}`, price: v.price, image: sauces.image, category: 'Соусы', qty: 1 });
+          saveCart(); updateCartUI(); renderMenu();
+        });
+        $addMoreChips.appendChild(chip);
+      });
+    }
+
+    function openCart() { $cartSheet.classList.add('active'); $cartOverlay.classList.add('active'); updateCartUI(); renderAddMoreChips(); document.body.style.overflow = 'hidden'; }
+    function closeCart() { $cartSheet.classList.remove('active'); $cartOverlay.classList.remove('active'); document.body.style.overflow = ''; }
+
+    function openOrderModal() {
+      if (!cart.length) return;
+      $orderModalOverlay.classList.add('active');
+      $successMsg.style.display = 'none';
+      $orderForm.style.display = 'block';
+      $cartData.value = JSON.stringify(cart);
+      $orderTotal.value = getCartTotal();
+      $deliveryMode.value = deliveryMode;
+    }
+    function closeOrderModal() { $orderModalOverlay.classList.remove('active'); }
+
+    $orderForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('btnSubmit');
+      btn.disabled = true; btn.textContent = '⏳ Отправка...';
+      const phone = document.getElementById('formPhone').value.trim();
+      if (!/^(\+7|8)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(phone.replace(/\s/g,''))) { alert('Некорректный телефон'); btn.disabled = false; btn.textContent = '📩 Отправить заказ'; return; }
+      try {
+        const res = await fetch('https://formspree.io/f/YOUR_ENDPOINT', { method: 'POST', body: new FormData($orderForm), headers: {'Accept':'application/json'} });
+        if (res.ok) {
+          $orderForm.style.display = 'none'; $successMsg.style.display = 'block';
+          cart = []; saveCart(); updateCartUI(); renderMenu(); closeCart();
+          setTimeout(() => { closeOrderModal(); $successMsg.style.display = 'none'; $orderForm.style.display = 'block'; }, 3000);
+        } else throw new Error();
+      } catch(err) { alert('⚠️ Ошибка отправки. Позвоните 8-938-888-64-02'); }
+      btn.disabled = false; btn.textContent = '📩 Отправить заказ';
+    });
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if (tab === 'menu') {
+        document.getElementById('tabMenu').classList.add('active');
+        $mainContent.style.display = 'block';
+        $restaurantsView.classList.remove('active');
+        closeCart();
+      } else if (tab === 'restaurants') {
+        document.getElementById('tabRestaurants').classList.add('active');
+        $mainContent.style.display = 'none';
+        $restaurantsView.classList.add('active');
+        closeCart();
+      } else if (tab === 'cart') {
+        document.getElementById('tabCart').classList.add('active');
+        openCart();
+        $mainContent.style.display = 'block';
+        $restaurantsView.classList.remove('active');
+      }
+    }
+
+    document.getElementById('tabMenu').addEventListener('click', ()=>switchTab('menu'));
+    document.getElementById('tabRestaurants').addEventListener('click', ()=>switchTab('restaurants'));
+    document.getElementById('tabCart').addEventListener('click', ()=>switchTab('cart'));
+    document.getElementById('headerCartBtn').addEventListener('click', ()=>switchTab('cart'));
+
+    $categoriesScroll.addEventListener('click', e => {
+      const chip = e.target.closest('.cat-chip');
+      if (!chip) return;
+      activeCategory = chip.dataset.cat;
+      document.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderMenu();
+    });
+
+    $searchInput.addEventListener('input', () => { searchQuery = $searchInput.value; renderMenu(); });
+    $cartOverlay.addEventListener('click', closeCart);
+    $btnCheckout.addEventListener('click', () => { if(cart.length) { closeCart(); setTimeout(openOrderModal, 400); } });
+    document.getElementById('modalClose').addEventListener('click', closeOrderModal);
+    $orderModalOverlay.addEventListener('click', e => { if(e.target === $orderModalOverlay) closeOrderModal(); });
+
+    document.querySelectorAll('.payment-option').forEach(opt => opt.addEventListener('click', function() {
+      document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('active'));
+      this.classList.add('active');
+      $paymentMethod.value = this.dataset.payment;
+      $paymentNote.classList.toggle('show', this.dataset.payment === 'online');
+    }));
+
+    document.getElementById('cartToggle').addEventListener('click', e => {
+      const btn = e.target.closest('button');
+      if(!btn) return;
+      document.querySelectorAll('#cartToggle button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      deliveryMode = btn.dataset.mode;
+      $deliveryMode.value = deliveryMode;
+    });
+
+    $productModalOverlay.addEventListener('click', (e) => {
+      if (e.target === $productModalOverlay) $productModalOverlay.classList.remove('active');
+    });
+
+    updateMapAndRoute();
+
+    function init() {
+      renderMenu();
+      updateCartUI();
+      $mainContent.style.display = 'block';
+      $restaurantsView.classList.remove('active');
+      document.getElementById('tabMenu').classList.add('active');
+    }
+    init();
+  })();
+</script>
+</body>
+</html>
