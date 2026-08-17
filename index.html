@@ -19,6 +19,9 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="100.jpg">
 
+  <!-- EmailJS SDK -->
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -359,6 +362,9 @@
 
 <script>
   (function() {
+    // Инициализация EmailJS с вашим Public Key
+    emailjs.init('3BdGG5vYfl6fNt7yF');
+
     const RESTAURANT_LAT = 43.627763;
     const RESTAURANT_LNG = 39.696130;
 
@@ -734,21 +740,89 @@
     }
     function closeOrderModal() { $orderModalOverlay.classList.remove('active'); }
 
+    // НОВЫЙ ОБРАБОТЧИК ОТПРАВКИ ФОРМЫ ЧЕРЕЗ EMAILJS
     $orderForm.addEventListener('submit', async e => {
       e.preventDefault();
       const btn = document.getElementById('btnSubmit');
-      btn.disabled = true; btn.textContent = '⏳ Отправка...';
+      btn.disabled = true;
+      btn.textContent = '⏳ Отправка...';
+
+      const name = document.getElementById('formName').value.trim();
       const phone = document.getElementById('formPhone').value.trim();
-      if (!/^(\+7|8)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(phone.replace(/\s/g,''))) { alert('Некорректный телефон'); btn.disabled = false; btn.textContent = '📩 Отправить заказ'; return; }
+      const city = document.getElementById('formCity').value.trim();
+      const street = document.getElementById('formStreet').value.trim();
+      const house = document.getElementById('formHouse').value.trim();
+      const apartment = document.getElementById('formApartment').value.trim();
+      const comment = document.getElementById('formComment').value.trim();
+      const paymentMethod = document.getElementById('paymentMethod').value === 'online' ? 'Онлайн' : 'Наличные';
+
+      if (!name || !/^(\+7|8)?[\s\-]?\(?\d{3}\)?[\s\-]?\d{3}[\s\-]?\d{2}[\s\-]?\d{2}$/.test(phone.replace(/\s/g, ''))) {
+        alert('Укажите корректные имя и телефон');
+        btn.disabled = false;
+        btn.textContent = '📩 Отправить заказ';
+        return;
+      }
+
+      let orderText = '';
+      let totalSum = 0;
+      cart.forEach(item => {
+        const sum = item.price * item.qty;
+        orderText += `${item.name} — ${item.price} ₽ × ${item.qty} = ${sum} ₽\n`;
+        totalSum += sum;
+      });
+
+      const templateParams = {
+        customer_name: name,
+        phone: phone,
+        city: city,
+        street: street,
+        house: house,
+        apartment: apartment,
+        comment: comment,
+        payment_method: paymentMethod,
+        order: orderText.trim(),
+        order_total: totalSum
+      };
+
       try {
-        const res = await fetch('https://formspree.io/f/YOUR_ENDPOINT', { method: 'POST', body: new FormData($orderForm), headers: {'Accept':'application/json'} });
-        if (res.ok) {
-          $orderForm.style.display = 'none'; $successMsg.style.display = 'block';
-          cart = []; saveCart(); updateCartUI(); renderMenu(); closeCart();
-          setTimeout(() => { closeOrderModal(); $successMsg.style.display = 'none'; $orderForm.style.display = 'block'; }, 3000);
-        } else throw new Error();
-      } catch(err) { alert('⚠️ Ошибка отправки. Позвоните 8-938-888-64-02'); }
-      btn.disabled = false; btn.textContent = '📩 Отправить заказ';
+        const response = await emailjs.send(
+          'service_xi6gh8y',       // Ваш Service ID
+          'template_vlwexfn',      // Ваш Template ID
+          templateParams
+        );
+
+        if (response.status === 200) {
+          $orderForm.style.display = 'none';
+          $successMsg.style.display = 'block';
+          $successMsg.innerHTML = '✅ <strong>Заказ отправлен!</strong><br>Мы свяжемся с вами для подтверждения заказа.';
+
+          cart = [];
+          saveCart();
+          updateCartUI();
+          renderMenu();
+          closeCart();
+
+          setTimeout(() => {
+            closeOrderModal();
+            $successMsg.style.display = 'none';
+            $orderForm.style.display = 'block';
+            $orderForm.reset();
+            document.getElementById('formCity').value = 'Сочи';
+            document.getElementById('paymentMethod').value = 'cash';
+            document.querySelectorAll('.payment-option').forEach((opt, i) => opt.classList.toggle('active', i === 0));
+            document.getElementById('paymentNote').classList.remove('show');
+          }, 3000);
+        } else {
+          throw new Error('Send failed');
+        }
+      } catch (error) {
+        console.error('EmailJS error:', error);
+        alert('⚠️ Не удалось отправить заказ. Проверьте соединение и попробуйте ещё раз.');
+        // Корзину НЕ очищаем
+      }
+
+      btn.disabled = false;
+      btn.textContent = '📩 Отправить заказ';
     });
 
     function switchTab(tab) {
