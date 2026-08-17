@@ -264,7 +264,7 @@
       <input type="text" id="searchInput" placeholder="Поиск по меню...">
     </div>
 
-    <!-- CATEGORIES -->
+    <!-- CATEGORIES (убраны Лимонады и Чаи) -->
     <div class="categories-scroll" id="categoriesScroll">
       <span class="cat-chip active" data-cat="all">Все</span>
       <span class="cat-chip" data-cat="Комбо">Комбо</span>
@@ -277,8 +277,6 @@
       <span class="cat-chip" data-cat="Холодные роллы">Холодные роллы</span>
       <span class="cat-chip" data-cat="Жареные роллы">Жареные роллы</span>
       <span class="cat-chip" data-cat="Запеченные роллы">Запеченные роллы</span>
-      <span class="cat-chip" data-cat="Лимонады">Лимонады</span>
-      <span class="cat-chip" data-cat="Чаи">Чаи</span>
       <span class="cat-chip" data-cat="Соусы">Соусы</span>
     </div>
 
@@ -371,6 +369,7 @@
       }
     }
 
+    // Меню (напитки удалены)
     const menuData = [
       { id: 'combo1', category: 'Комбо', title: 'Комбо №1', image: 'combo1.jpg', desc: 'Бургер BBQ с беконом + картофель по-деревенски маленький + морс.', variants: [{ size: 'Стандарт', price: 859 }] },
       { id: 'combo2', category: 'Комбо', title: 'Новинка Пара', image: 'combo2.jpg', desc: 'Мегавиль + Бургервиль + хрустящие креветки в панировке 4 шт + картофель фри большой + морс.', variants: [{ size: 'Стандарт', price: 789 }] },
@@ -413,16 +412,7 @@
       { id: 'nido', category: 'Жареные роллы', title: 'Нидо (8 шт)', image: '62.jpg', desc: 'Рис, нори, сливочный сыр, авокадо, угорь, гребешок, соус унаги, кляр.', variants: [{ size: '8 шт', price: 809 }] },
       { id: 'yukai', category: 'Жареные роллы', title: 'Юкай (8 шт)', image: '94.jpg', desc: 'Рис, нори, сливочный сыр, масаго, тигровая креветка, лосось терияки, авокадо, соус унаги, кляр.', variants: [{ size: '8 шт', price: 799 }] },
       { id: 'sanka', category: 'Запеченные роллы', title: 'Санка (8 шт)', image: '83.jpg', desc: 'Рис, нори, творожный сыр, огурец, лосось, угорь, тигровая креветка, яки соус, соус унаги.', variants: [{ size: '8 шт', price: 819 }] },
-      { id: 'yuake', category: 'Запеченные роллы', title: 'Юакэ (8 шт)', image: '93.jpg', desc: 'Рис, нори, лосось, гребешок, огурец, яки соус, чили соус.', variants: [{ size: '8 шт', price: 809 }] },
-      { id: 'lemonades', category: 'Лимонады', title: 'Лимонад', image: '2.jpg', desc: 'Освежающие лимонады (500 мл).', variants: [
-        { size: 'Клубника-лайм', price: 349 }, { size: 'Ананас-базилик', price: 349 }, { size: 'Гранат-смородина', price: 349 },
-        { size: 'Киви-фейхоа', price: 349 }, { size: 'Манго-лимон', price: 349 }
-      ]},
-      { id: 'tea', category: 'Чаи', title: 'Чай', image: '4.jpg', desc: 'Ароматный чай.', variants: [
-        { size: '350 мл Манго-маракуя', price: 249 }, { size: '350 мл Черника-мята', price: 249 }, { size: '350 мл Тропический киви', price: 249 },
-        { size: '350 мл Земляничный', price: 249 }, { size: '350 мл Пряная облепиха', price: 249 },
-        { size: '750 мл Жасминовый улун', price: 549 }, { size: '750 мл Фруктовый', price: 549 }, { size: '750 мл Травяной малина-мята', price: 549 }
-      ]}
+      { id: 'yuake', category: 'Запеченные роллы', title: 'Юакэ (8 шт)', image: '93.jpg', desc: 'Рис, нори, лосось, гребешок, огурец, яки соус, чили соус.', variants: [{ size: '8 шт', price: 809 }] }
     ];
 
     let cart = [];
